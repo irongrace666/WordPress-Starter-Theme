@@ -1,105 +1,76 @@
 <?php
-
-	if (!empty($_SERVER['SCRIPT_FILENAME']) && 'comments.php' == basename($_SERVER['SCRIPT_FILENAME']))
-		die ('Please do not load this page directly. Thanks!');
-
-	if ( post_password_required() ) { ?>
-		This post is password protected. Enter the password to view comments.
-	<?php
-		return;
-	}
+/**
+ * The template for displaying Comments.
+ *
+ * The area of the page that contains both current comments
+ * and the comment form. The actual display of comments is
+ * handled by a callback to mattbanks_comment() which is
+ * located in the functions.php file.
+ *
+ * @package mattbanks
+ * @since mattbanks 1.0
+ */
 ?>
 
-<div id="comments">
+<?php
+	/*
+	 * If the current post is protected by a password and
+	 * the visitor has not yet entered the password we will
+	 * return early without loading the comments.
+	 */
+	if ( post_password_required() )
+		return;
+?>
+
+	<div id="comments" class="comments-area">
+
+	<?php // You can start editing here -- including this comment! ?>
 
 	<?php if ( have_comments() ) : ?>
-		
-		<h2 id="comments"><?php comments_number('No Responses', 'One Response', '% Responses' );?></h2>
-	
-		<div class="navigation">
-			<div class="next-posts"><?php previous_comments_link() ?></div>
-			<div class="prev-posts"><?php next_comments_link() ?></div>
-		</div>
-	
+		<h2 class="comments-title">
+			<?php
+				printf( _n( 'One thought on &ldquo;%2$s&rdquo;', '%1$s thoughts on &ldquo;%2$s&rdquo;', get_comments_number(), 'mattbanks' ),
+					number_format_i18n( get_comments_number() ), '<span>' . get_the_title() . '</span>' );
+			?>
+		</h2>
+
+		<?php if ( get_comment_pages_count() > 1 && get_option( 'page_comments' ) ) : // are there comments to navigate through ?>
+		<nav role="navigation" id="comment-nav-above" class="site-navigation comment-navigation">
+			<h1 class="assistive-text"><?php _e( 'Comment navigation', 'mattbanks' ); ?></h1>
+			<div class="nav-previous"><?php previous_comments_link( __( '&larr; Older Comments', 'mattbanks' ) ); ?></div>
+			<div class="nav-next"><?php next_comments_link( __( 'Newer Comments &rarr;', 'mattbanks' ) ); ?></div>
+		</nav><!-- #comment-nav-before .site-navigation .comment-navigation -->
+		<?php endif; // check for comment navigation ?>
+
 		<ol class="commentlist">
-			<?php wp_list_comments('avatar_size=40'); ?>
-		</ol>
-	
-		<div class="navigation">
-			<div class="next-posts"><?php previous_comments_link() ?></div>
-			<div class="prev-posts"><?php next_comments_link() ?></div>
-		</div>
-		
-	 <?php else : // this is displayed if there are no comments so far ?>
-	
-		<?php if ( comments_open() ) : ?>
-			<!-- If comments are open, but there are no comments. -->
-	
-		 <?php else : // comments are closed ?>
-			<p>Comments are closed.</p>
-	
-		<?php endif; ?>
-		
+			<?php
+				/* Loop through and list the comments. Tell wp_list_comments()
+				 * to use mattbanks_comment() to format the comments.
+				 * If you want to overload this in a child theme then you can
+				 * define mattbanks_comment() and that will be used instead.
+				 * See mattbanks_comment() in inc/template-tags.php for more.
+				 */
+				wp_list_comments( array( 'callback' => 'mattbanks_comment' ) );
+			?>
+		</ol><!-- .commentlist -->
+
+		<?php if ( get_comment_pages_count() > 1 && get_option( 'page_comments' ) ) : // are there comments to navigate through ?>
+		<nav role="navigation" id="comment-nav-below" class="site-navigation comment-navigation">
+			<h1 class="assistive-text"><?php _e( 'Comment navigation', 'mattbanks' ); ?></h1>
+			<div class="nav-previous"><?php previous_comments_link( __( '&larr; Older Comments', 'mattbanks' ) ); ?></div>
+			<div class="nav-next"><?php next_comments_link( __( 'Newer Comments &rarr;', 'mattbanks' ) ); ?></div>
+		</nav><!-- #comment-nav-below .site-navigation .comment-navigation -->
+		<?php endif; // check for comment navigation ?>
+
+	<?php endif; // have_comments() ?>
+
+	<?php
+		// If comments are closed and there are comments, let's leave a little note, shall we?
+		if ( ! comments_open() && '0' != get_comments_number() && post_type_supports( get_post_type(), 'comments' ) ) :
+	?>
+		<p class="nocomments"><?php _e( 'Comments are closed.', 'mattbanks' ); ?></p>
 	<?php endif; ?>
 
-</div> <!-- #comments -->
+	<?php comment_form(); ?>
 
-<?php if ( comments_open() ) : ?>
-
-<div id="respond">
-
-	<h2><?php comment_form_title( 'Leave a Reply', 'Leave a Reply to %s' ); ?></h2>
-
-	<div class="cancel-comment-reply">
-		<?php cancel_comment_reply_link(); ?>
-	</div>
-
-	<?php if ( get_option('comment_registration') && !is_user_logged_in() ) : ?>
-		<p>You must be <a href="<?php echo wp_login_url( get_permalink() ); ?>">logged in</a> to post a comment.</p>
-	<?php else : ?>
-
-	<form action="<?php echo get_option('siteurl'); ?>/wp-comments-post.php" method="post" id="commentform">
-
-		<?php if ( is_user_logged_in() ) : ?>
-
-			<p>Logged in as <a href="<?php echo get_option('siteurl'); ?>/wp-admin/profile.php"><?php echo $user_identity; ?></a>. <a href="<?php echo wp_logout_url(get_permalink()); ?>" title="Log out of this account">Log out &raquo;</a></p>
-
-		<?php else : ?>
-
-			<div>
-				<input type="text" name="author" id="author" value="<?php echo esc_attr($comment_author); ?>" size="22" tabindex="1" <?php if ($req) echo "aria-required='true'"; ?> />
-				<label for="author">Name <?php if ($req) echo "(required)"; ?></label>
-			</div>
-
-			<div>
-				<input type="text" name="email" id="email" value="<?php echo esc_attr($comment_author_email); ?>" size="22" tabindex="2" <?php if ($req) echo "aria-required='true'"; ?> />
-				<label for="email">Mail (will not be published) <?php if ($req) echo "(required)"; ?></label>
-			</div>
-
-			<div>
-				<input type="text" name="url" id="url" value="<?php echo esc_attr($comment_author_url); ?>" size="22" tabindex="3" />
-				<label for="url">Website</label>
-			</div>
-
-		<?php endif; ?>
-
-		<!--<p>You can use these tags: <code><?php echo allowed_tags(); ?></code></p>-->
-
-		<div>
-			<textarea name="comment" id="comment" cols="58" rows="10" tabindex="4"></textarea>
-		</div>
-
-		<div>
-			<input name="submit" type="submit" id="submit" tabindex="5" value="Submit Comment" />
-			<?php comment_id_fields(); ?>
-		</div>
-		
-		<?php do_action('comment_form', $post->ID); ?>
-
-	</form>
-
-	<?php endif; // If registration required and not logged in ?>
-	
-</div>
-
-<?php endif; ?>
+</div><!-- #comments .comments-area -->

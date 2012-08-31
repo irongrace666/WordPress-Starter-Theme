@@ -2,23 +2,13 @@
 
 	<section id="main" role="main">
 
-	<?php if (have_posts()) : while (have_posts()) : the_post(); ?>
-			
-		<div class="post" id="post-<?php the_ID(); ?>">
+		<?php while ( have_posts() ) : the_post(); ?>
 
-			<h1><?php the_title(); ?></h1>
+			<?php get_template_part( 'content', 'page' ); ?>
 
-			<div class="entry">
+			<?php comments_template( '', true ); ?>
 
-				<?php the_content(); ?>
-
-				<?php wp_link_pages(array('before' => 'Pages: ', 'next_or_number' => 'number')); ?>
-
-			</div>
-
-		</div>
-
-		<?php endwhile; endif; ?>
+		<?php endwhile; // end of the loop. ?>
 		
 	</section> <!-- /#main -->
 

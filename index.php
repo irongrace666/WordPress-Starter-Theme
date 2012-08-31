@@ -2,33 +2,28 @@
 
 	<section id="main" role="main">
 
-		<?php if (have_posts()) : while (have_posts()) : the_post(); ?>
+		<?php if ( have_posts() ) : ?>
 
-			<article <?php post_class() ?> id="post-<?php the_ID(); ?>">
+			<?php mattbanks_content_nav( 'nav-above' ); ?>
 
-				<h1><a href="<?php the_permalink() ?>"><?php the_title(); ?></a></h1>
+			<?php /* Start the Loop */ ?>
+			<?php while ( have_posts() ) : the_post(); ?>
 
-				<?php get_template_part( 'inc', 'meta' ); ?>
+				<?php
+					/* Include the Post-Format-specific template for the content.
+					 * If you want to overload this in a child theme then include a file
+					 * called content-___.php (where ___ is the Post Format name) and that will be used instead.
+					 */
+					get_template_part( 'content', get_post_format() );
+				?>
 
-				<div class="entry">
-					<?php the_content(); ?>
-				</div>
+			<?php endwhile; ?>
 
-				<div class="postmetadata">
-					<?php the_tags('Tags: ', ', ', '<br />'); ?>
-					Posted in <?php the_category(', ') ?> | 
-					<?php comments_popup_link('No Comments &#187;', '1 Comment &#187;', '% Comments &#187;'); ?>
-				</div>
+			<?php mattbanks_content_nav( 'nav-below' ); ?>
 
-			</article>
+		<?php elseif ( current_user_can( 'edit_posts' ) ) : ?>
 
-		<?php endwhile; ?>
-
-		<?php get_template_part( 'inc', 'nav' ); ?>
-
-		<?php else : ?>
-
-			<h2>Not Found</h2>
+			<?php get_template_part( 'no-results', 'index' ); ?>
 
 		<?php endif; ?>
 	

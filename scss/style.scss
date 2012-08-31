@@ -8,19 +8,17 @@ Version: 1.0
 */
 
 // Reset, Variables, Mixins, Etc
-// DO NOT EDIT ORDER OF FILES
 @import "variables";
-@import "base";
+@import "normalize";
 @import "mixins";
 
 // Compass imports
-@import "compass/css3";
-@import "compass/typography";
-@import "compass/utilities";
+@import "compass";
 
 // Page and Site Styles
 @import "page";
 @import "posts";
+@import "media";
 @import "widgets";
 @import "search";
 @import "comments";

@@ -2,35 +2,26 @@
 
 	<section id="main" role="main">
 
-		<?php if (have_posts()) : ?>
+		<?php if ( have_posts() ) : ?>
 
-			<h1>Search Results</h1>
+			<div class="page-header">
+				<h1 class="page-title"><?php printf( __( 'Search Results for: %s', 'mattbanks' ), '<span>' . get_search_query() . '</span>' ); ?></h1>
+			</div><!-- .page-header -->
 
-			<?php get_template_part( 'inc', 'nav' ); ?>
+			<?php mattbanks_content_nav( 'nav-above' ); ?>
 
-			<?php while (have_posts()) : the_post(); ?>
+			<?php /* Start the Loop */ ?>
+			<?php while ( have_posts() ) : the_post(); ?>
 
-				<article <?php post_class() ?> id="post-<?php the_ID(); ?>">
-
-					<h1><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h1>
-
-					<?php get_template_part( 'inc', 'meta' ); ?>
-
-					<div class="entry">
-
-						<?php the_excerpt(); ?>
-
-					</div>
-
-				</article>
+				<?php get_template_part( 'content', 'search' ); ?>
 
 			<?php endwhile; ?>
 
-			<?php get_template_part( 'inc', 'nav' ); ?>
+			<?php mattbanks_content_nav( 'nav-below' ); ?>
 
 		<?php else : ?>
 
-			<h1>No posts found.</h1>
+			<?php get_template_part( 'no-results', 'search' ); ?>
 
 		<?php endif; ?>
 	
