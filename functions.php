@@ -70,6 +70,9 @@ function mattbanks_scripts() {
 		wp_enqueue_script( 'comment-reply' );
 	}
 	if ( !is_admin() ) {
+		wp_deregister_script('jquery');
+		wp_register_script('jquery', "http" . ($_SERVER['SERVER_PORT'] == 443 ? "s" : "") . "://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js", false, NULL);
+		wp_enqueue_script('jquery');		
 		wp_enqueue_script('modernizr', get_bloginfo('template_directory').'/js/vendor/modernizr-2.6.1.min.js', false, NULL );
 		wp_enqueue_script('customplugins', get_bloginfo('template_directory').'/js/plugins.min.js', array('jquery'), NULL, true );
 		wp_enqueue_script('customscripts', get_bloginfo('template_directory').'/js/script.min.js', array('jquery'), NULL, true );
